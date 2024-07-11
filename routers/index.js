@@ -2,10 +2,18 @@ const allRoutes = require("express").Router()
 const apiVersion = require("../constants/baseUrl")
 const accountRoutes = require('./accountRoutes')
 const blogRoutes = require("./blogRoutes")
+const productRoutes = require("./productRoutes")
+const movieRoutes = require("./movieRoutes")
+const likeRoutes = require("./likeRoutes")
+const seasonRoutes= require("./seasonRoutes")
 
 
 allRoutes.use(`${apiVersion}/user`,accountRoutes)
 allRoutes.use(`${apiVersion}/blog`,blogRoutes)
+allRoutes.use(`${apiVersion}/product`,productRoutes)
+allRoutes.use(`${apiVersion}/movies`,movieRoutes)
+allRoutes.use(`${apiVersion}/likes`,likeRoutes)
+allRoutes.use(`${apiVersion}/season`,seasonRoutes)
 
 
 module.exports = allRoutes
