@@ -175,6 +175,22 @@ const loginAccount = async (req,res) =>{
     }  
 }
 
+const getUser = async (req,res) =>{
+    try {
+        let res = await accountModel.findById(req.params.id)
+        if(res){
+            return res.status(200).json({msg:null,data:res,statusCode:200})
+        }
+        else{
+            return res.status(404).json({msg:"Invalid Id",data:null,statusCode:404})
+
+        }
+    } 
+    catch (error) {
+        console.log(error,'error')
+    }
+}
 
 
-module.exports = { registerAccount, verifyOtp,resendOtp,loginAccount,forgetPassword,changePassword }
+
+module.exports = { registerAccount, verifyOtp,resendOtp,loginAccount,forgetPassword,changePassword ,getUser}

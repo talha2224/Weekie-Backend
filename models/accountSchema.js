@@ -9,7 +9,11 @@ const accountSchema = mongoose.Schema({
     accountVerified:{type:Boolean,default:false},
     otp:{type:String,default:null},
     expireAt:{type:String,default:null},
-    otpVerified:{type:Boolean,default:false}
+    otpVerified:{type:Boolean,default:false},
+    sessionid:{type:String,default:null},
+    subscriptionType:{type:String,default:null},
+    subscribed:{type:Boolean,default:false},
+    subscriptionDate:{type:String,default:null}
 })
 
 const Accounts = mongoose.model("Accounts",accountSchema,"Accounts")

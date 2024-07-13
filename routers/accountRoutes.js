@@ -10,6 +10,8 @@ router.post("/login",loginAccount)
 router.post("/forget/password",forgetPassword)
 router.post("/change/password",changePassword)
 
+router.get("/get/single/:id",changePassword)
+
 
 
 
