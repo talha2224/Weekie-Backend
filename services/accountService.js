@@ -10,7 +10,7 @@ const registerAccount = async (req, res) => {
         if (registerType.toLowerCase() === "email") {
             let userExits = await accountModel.findOne({ email: email })
             if (userExits) {
-                return res.status(HttpStatusCodes.Conflict).json({ error: "Email Already Exits" })
+                return res.status(HttpStatusCodes.Conflict).json({statusCode:HttpStatusCodes.Conflict, msg: "Email Already Exits",data:null })
             }
             else {
                 let hashPassword = await bcrypt.hash(password, 10)
@@ -28,7 +28,7 @@ const registerAccount = async (req, res) => {
         else {
             let userExits = await accountModel.findOne({ phoneNumber: phoneNumber })
             if (userExits) {
-                return res.status(HttpStatusCodes.Conflict).json({ error: "Phone Number Already Exits" })
+                return res.status(HttpStatusCodes.Conflict).json({data:null,statusCode:HttpStatusCodes.Conflict, msg: "Phone Number Already Exits" })
             }
             else {
                 let hashPassword = await bcrypt.hash(password, 10)
@@ -66,24 +66,24 @@ const verifyOtp = async (req, res) => {
                     }
                 }
                 else {
-                    return res.status(HttpStatusCodes["Unauthorized"]).json({ msg: "Otp Expired" })
+                    return res.status(HttpStatusCodes["Unauthorized"]).json({data:null, statusCode:HttpStatusCodes["Unauthorized"], msg: "Otp Expired" })
                 }
             }
             else {
-                return res.status(HttpStatusCodes["Bad Request"]).json({ msg: "Invalid Otp" })
+                return res.status(HttpStatusCodes["Bad Request"]).json({ data:null, statusCode:HttpStatusCodes["Bad Request"],msg: "Invalid Otp" })
             }
         }
     }
     catch (error) {
         console.log(error)
-        return res.status(HttpStatusCodes["Internal Server Error"]).json({ msg: "Unexpected error" })
+        return res.status(HttpStatusCodes["Internal Server Error"]).json({data:null, statusCode:HttpStatusCodes["Internal Server Error"], msg: "Unexpected error" })
     }
 }
 const resendOtp = async (req, res) => {
     try {
         let { email } = req.body
         let findAccount = await accountModel.findOne({email:email})
-        if (!findAccount) { return res.status(HttpStatusCodes["Not Found"]).json({ msg: "Invalid Id pass" }) }
+        if (!findAccount) { return res.status(HttpStatusCodes["Not Found"]).json({data:null,statusCode:HttpStatusCodes["Not Found"], msg: "Invalid Id pass" }) }
         else {
             let expireAt = await getCurrentTimePlusFiveMinutes()
             let otp = await generateSixDigitCode()
@@ -104,7 +104,7 @@ const forgetPassword = async (req,res)=>{
     try {
         let { email } = req.body
         let findAccount = await accountModel.findOne({email:email})
-        if (!findAccount) { return res.status(HttpStatusCodes["Not Found"]).json({ msg: "Invalid Email" }) }
+        if (!findAccount) { return res.status(HttpStatusCodes["Not Found"]).json({data:null,statusCode:HttpStatusCodes["Not Found"], msg:"Invalid Email" }) }
         else {
             let expireAt = await getCurrentTimePlusFiveMinutes()
             let otp = await generateSixDigitCode()
@@ -125,7 +125,7 @@ const changePassword = async (req,res) =>{
     try {
         let { email, password } = req.body
         let findAccount = await accountModel.findOne({email:email})
-        if (!findAccount) { return res.status(HttpStatusCodes["Not Found"]).json({ msg: "Invalid Id pass" }) }
+        if (!findAccount) { return res.status(HttpStatusCodes["Not Found"]).json({data:null,statusCode:HttpStatusCodes["Not Found"], msg: "Invalid Id pass" }) }
         else {
             let hashPassword = await bcrypt.hash(password, 10)
             let update = await accountModel.findByIdAndUpdate(findAccount._id, {otpVerified: false,password:hashPassword }, { new: true })
@@ -146,7 +146,7 @@ const loginAccount = async (req,res) =>{
         if(loginType){
             if(loginType.toLowerCase() === "email"){
                 let findAccount = await accountModel.findOne({email:email})
-                if (!findAccount) { return res.status(HttpStatusCodes["Not Found"]).json({ msg: "Invalid Email" }) }
+                if (!findAccount) { return res.status(HttpStatusCodes["Not Found"]).json({data:null,statusCode:HttpStatusCodes["Not Found"], msg: "Invalid Email" }) }
                 else {
                     if(findAccount.accountVerified) {
                         let comparePassword = await bcrypt.compare(password,findAccount.password)
