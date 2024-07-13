@@ -14,11 +14,11 @@ const createMovieService = async (req,res)=>{
             let videoUrl = await uploadFile(video)
             let data = await moviesModel.create({title,description,cast,director,maturaity,genres,releaseDate,image:imageUrl,video:videoUrl})
             if(data){
-                return res.status(HttpStatusCodes["OK"]).json({data:data})
+                return res.status(HttpStatusCodes["OK"]).json({msg:null,data:data,statusCode:200})
             }
         }
         else{
-            return res.status(HttpStatusCodes["Not Found"]).json({msg:"Please upload image and video"})
+            return res.status(HttpStatusCodes["Not Found"]).json({data:null,msg:"Please upload image and video",statusCode:HttpStatusCodes["Not Found"]})
         }
     } 
     catch (error) {
@@ -36,13 +36,13 @@ const editMovieService = async (req,res)=>{
             let imageUrl = await uploadFile(image)
             let data = await moviesModel.findByIdAndUpdate(id,{title,description,cast,director,maturaity,genres,releaseDate,image:imageUrl},{new:true})
             if(data){
-                return res.status(HttpStatusCodes["OK"]).json({data:data})
+                return res.status(HttpStatusCodes["OK"]).json({msg:null,data:data,statusCode:200})
             }
         }
         else{
             let data = await moviesModel.findByIdAndUpdate(id,{title,description,cast,director,maturaity,genres,releaseDate},{new:true})
             if(data){
-                return res.status(HttpStatusCodes["OK"]).json({data:data})
+                return res.status(HttpStatusCodes["OK"]).json({msg:null,data:data,statusCode:200})
             }
         }
     } 
@@ -56,10 +56,10 @@ const getAllMovieService = async (req,res)=>{
     try {
         let data = await moviesModel.find({})
         if(data.length>0){
-            return res.status(200).json({data:data})
+            return res.status(200).json({msg:null,data:data,statusCode:200})
         }
         else{
-            return res.status(HttpStatusCodes["Not Found"]).json({msg:"No Movie Found"})
+            return res.status(HttpStatusCodes["Not Found"]).json({data:null,msg:"No Movie Found",statusCode:HttpStatusCodes["Not Found"]})
         }
     } 
     catch (error) {
@@ -74,10 +74,10 @@ const getSingleMovieService = async (req,res)=>{
         let data = await moviesModel.findById(req.params.id)
         let likes = await likesModel.find({movieId:req.params.id})
         if(data){
-            return res.status(200).json({data:data,likes:likes})
+            return res.status(200).json({msg:null,data:data,likes:likes,statusCode:200})
         }
         else{
-            return res.status(HttpStatusCodes["Not Found"]).json({msg:"No Movie Found"})
+            return res.status(HttpStatusCodes["Not Found"]).json({data:null,msg:"No Movie Found",statusCode:HttpStatusCodes["Not Found"]})
         }
     } 
     catch (error) {
@@ -92,10 +92,10 @@ const deleteMovieService = async (req,res)=>{
         let data = await moviesModel.findByIdAndDelete(req.params.id)
         let likes = await likesModel.deleteMany({movieId:req.params.id})
         if(data){
-            return res.status(200).json({msg:"Movie Deleted"})
+            return res.status(200).json({data:null,statusCode:200,msg:"Movie Deleted"})
         }
         else{
-            return res.status(HttpStatusCodes["Not Found"]).json({msg:"No Movie Found"})
+            return res.status(HttpStatusCodes["Not Found"]).json({data:null,statusCode:404,msg:"No Movie Found"})
         }
     } 
     catch (error) {

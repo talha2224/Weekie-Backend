@@ -19,7 +19,9 @@ const registerAccount = async (req, res) => {
                 let createAccount = await accountModel.create({ registerType, email, phoneNumber: null, password: hashPassword, otp, expireAt })
                 let sendOtp = await sendSignUpEmail(email, otp)
                 let createToken = await jwt.sign({ createAccount }, process.env.JWTKEY)
-                return res.status(HttpStatusCodes.OK).json({ token: createToken, data: createAccount, msg: "You have to verify your account we have send an otp at this email " })
+                return res.status(HttpStatusCodes.OK).json(
+                    {  token:createToken,data:createAccount ,msg: "You have to verify your account we have send an otp at this email",statusCode:200}
+                )
             }
         }
     
@@ -35,7 +37,9 @@ const registerAccount = async (req, res) => {
                 let createAccount = await accountModel.create({ registerType, email: null, phoneNumber, password: hashPassword, otp, expireAt })
                 let sendOtp = await sendSignUpEmail(email, otp)
                 let createToken = await jwt.sign({ createAccount }, process.env.JWTKEY)
-                return res.status(HttpStatusCodes.OK).json({ token: createToken, accountInfo: createAccount, msg: "You have to verify your account we have send an otp at this email " })
+                return res.status(HttpStatusCodes.OK).json(
+                    { token:createToken,data: createAccount,msg: "You have to verify your account we have send an otp at this email",statusCode:200}
+                )
             }
         }
     }
@@ -56,7 +60,9 @@ const verifyOtp = async (req, res) => {
                     let update = await accountModel.findByIdAndUpdate(findAccount._id, { accountVerified: true, otpVerified: true }, { new: true })
                     if (update) {
                         let createToken = await jwt.sign({ update }, process.env.JWTKEY)
-                        return res.status(HttpStatusCodes.OK).json({ token: createToken, data: update, msg: "Otp Verified" })
+                        return res.status(HttpStatusCodes.OK).json(
+                            { token: createToken, data: update, msg: "Otp Verified",statusCode:200 }
+                        )
                     }
                 }
                 else {
@@ -84,7 +90,7 @@ const resendOtp = async (req, res) => {
             let sendOtp = await sendSignUpEmail(findAccount.email, otp)
             let update = await accountModel.findByIdAndUpdate(findAccount._id, {otpVerified: false,otp,expireAt }, { new: true })
             if (update) {
-                return res.status(HttpStatusCodes.OK).json({msg: "Otp Send" })
+                return res.status(HttpStatusCodes.OK).json({msg: "Otp Send",data:null,statusCode:200 })
             }
         }
     }
@@ -105,7 +111,7 @@ const forgetPassword = async (req,res)=>{
             let sendOtp = await sendSignUpEmail(findAccount.email, otp)
             let update = await accountModel.findByIdAndUpdate(findAccount._id, {otpVerified: false,otp,expireAt }, { new: true })
             if (update) {
-                return res.status(HttpStatusCodes.OK).json({msg: "Otp Send" })
+                return res.status(HttpStatusCodes.OK).json({msg: "Otp Send",data:null,statusCode:200 })
             }
         }
     }
@@ -124,7 +130,7 @@ const changePassword = async (req,res) =>{
             let hashPassword = await bcrypt.hash(password, 10)
             let update = await accountModel.findByIdAndUpdate(findAccount._id, {otpVerified: false,password:hashPassword }, { new: true })
             if (update) {
-                return res.status(HttpStatusCodes.OK).json({msg: "Password Changed" })
+                return res.status(HttpStatusCodes.OK).json({msg: "Password Changed",data:null,statusCode:200 })
             }
         }
     }
@@ -133,7 +139,6 @@ const changePassword = async (req,res) =>{
         return res.status(HttpStatusCodes["Internal Server Error"]).json({ msg: "Unexpected error" })
     }   
 }
-
 
 const loginAccount = async (req,res) =>{
     try {
@@ -147,21 +152,21 @@ const loginAccount = async (req,res) =>{
                         let comparePassword = await bcrypt.compare(password,findAccount.password)
                         if(comparePassword){
                             let createToken = await jwt.sign({ findAccount }, process.env.JWTKEY)
-                            return res.status(HttpStatusCodes.OK).json({ token: createToken, data: findAccount, msg: "Login sucess" })
+                            return res.status(HttpStatusCodes.OK).json({ token: createToken, data: findAccount, msg: "Login sucess",statusCode:200 })
                         }
                         else{
-                            return res.status(HttpStatusCodes["Unauthorized"]).json({msg: "Invalid Credentials" })
+                            return res.status(HttpStatusCodes["Unauthorized"]).json({msg: "Invalid Credentials",data:null,statusCode:HttpStatusCodes["Unauthorized"] })
                         }
                     }
                     else{
-                        return res.status(HttpStatusCodes["Not Acceptable"]).json({msg: "Account Not Verified" })
+                        return res.status(HttpStatusCodes["Not Acceptable"]).json({msg: "Account Not Verified",data:null,statusCode:HttpStatusCodes["Not Acceptable"] })
                     }
                 }
     
             }
         }
         else{
-            return res.status(HttpStatusCodes["Not Found"]).json({ msg: "loginType should be email or phoneNumber" })
+            return res.status(HttpStatusCodes["Not Found"]).json({ msg: "loginType should be email or phoneNumber",data:null,statusCode:HttpStatusCodes["Not Found"] })
         }
     }
     catch (error) {

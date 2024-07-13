@@ -11,7 +11,7 @@ const createBlogService = async (req,res)=>{
         let imageUrl = await uploadFile(image)
         let data = await blogModel.create({title,description,image:imageUrl})
         if(data){
-            return res.status(HttpStatusCodes["OK"]).json(data)
+            return res.status(HttpStatusCodes["OK"]).json({msg:null,data:data,statusCode:200})
         }
     } 
     catch (error) {
@@ -29,13 +29,13 @@ const editBlogService = async (req,res)=>{
             let imageUrl = await uploadFile(image)
             let data = await blogModel.findByIdAndUpdate(id,{title,description,image:imageUrl},{new:true})
             if(data){
-                return res.status(HttpStatusCodes["OK"]).json(data)
+                return res.status(HttpStatusCodes["OK"]).json({msg:null,data:data,statusCode:200})
             }
         }
         else{
             let data = await blogModel.findByIdAndUpdate(id,{title,description},{new:true})
             if(data){
-                return res.status(HttpStatusCodes["OK"]).json(data)
+                return res.status(HttpStatusCodes["OK"]).json({msg:null,data:data,statusCode:200})
             }
         }
     } 
@@ -49,10 +49,10 @@ const getAllBlogService = async (req,res)=>{
     try {
         let data = await blogModel.find({})
         if(data.length>0){
-            return res.status(200).json(data)
+            return res.status(200).json({statusCode:200,data:data,msg:null})
         }
         else{
-            return res.status(HttpStatusCodes["Not Found"]).json({msg:"No Blog Found"})
+            return res.status(HttpStatusCodes["Not Found"]).json({data:null,msg:"No Blog Found",statusCode:HttpStatusCodes["Not Found"]})
         }
     } 
     catch (error) {
@@ -66,10 +66,10 @@ const getSingleBlogService = async (req,res)=>{
     try {
         let data = await blogModel.findById(req.params.id)
         if(data){
-            return res.status(200).json(data)
+            return res.status(200).json({msg:null,data:data,statusCode:200})
         }
         else{
-            return res.status(HttpStatusCodes["Not Found"]).json({msg:"No Blog Found"})
+            return res.status(HttpStatusCodes["Not Found"]).json({data:null,msg:"No Blog Found",statusCode:HttpStatusCodes["Not Found"]})
         }
     } 
     catch (error) {
@@ -83,10 +83,10 @@ const deleteBlogService = async (req,res)=>{
     try {
         let data = await blogModel.findByIdAndDelete(req.params.id)
         if(data){
-            return res.status(200).json({msg:"Blog Deleted"})
+            return res.status(200).json({msg:"Blog Deleted",data:null,statusCode:200})
         }
         else{
-            return res.status(HttpStatusCodes["Not Found"]).json({msg:"No Blog Found"})
+            return res.status(HttpStatusCodes["Not Found"]).json({data:null,msg:"No Blog Found",statusCode:HttpStatusCodes["Not Found"]})
         }
     } 
     catch (error) {
