@@ -7,6 +7,7 @@ const movieRoutes = require("./movieRoutes")
 const likeRoutes = require("./likeRoutes")
 const seasonRoutes= require("./seasonRoutes")
 const paymentRoutes= require("./paymentRoutes")
+const streamingRoutes = require("./streamingRoutes")
 
 
 allRoutes.use(`${apiVersion}/user`,accountRoutes)
@@ -16,6 +17,7 @@ allRoutes.use(`${apiVersion}/movies`,movieRoutes)
 allRoutes.use(`${apiVersion}/likes`,likeRoutes)
 allRoutes.use(`${apiVersion}/season`,seasonRoutes)
 allRoutes.use(`${apiVersion}/payment`,paymentRoutes)
+allRoutes.use(`${apiVersion}/streaming`,streamingRoutes)
 
 
 module.exports = allRoutes
