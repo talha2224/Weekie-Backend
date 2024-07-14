@@ -6,6 +6,7 @@ const movieSchema = mongoose.Schema({
     description:{type:String,required:true},
     image:{type:String,required:true},
     video:{type:String,required:true},
+    category:{type:String,required:true},
     cast:{type:String,required:true},
     director:{type:String,required:true},
     maturaity:{type:String,required:true},

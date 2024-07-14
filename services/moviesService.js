@@ -6,13 +6,13 @@ const HttpStatusCodes = require("../constants/statusCode")
 
 const createMovieService = async (req,res)=>{
     try {
-        let {title,description,cast,director,maturaity,genres,releaseDate} = req.body
+        let {title,description,cast,director,maturaity,genres,releaseDate,category} = req.body
         if (req?.files?.image[0] && req?.files?.video[0]){
             let image = req?.files?.image[0]
             let video = req?.files?.video[0]
             let imageUrl = await uploadFile(image)
             let videoUrl = await uploadFile(video)
-            let data = await moviesModel.create({title,description,cast,director,maturaity,genres,releaseDate,image:imageUrl,video:videoUrl})
+            let data = await moviesModel.create({title,description,cast,director,maturaity,genres,releaseDate,image:imageUrl,video:videoUrl,category})
             if(data){
                 return res.status(HttpStatusCodes["OK"]).json({msg:null,data:data,statusCode:200})
             }
@@ -29,18 +29,18 @@ const createMovieService = async (req,res)=>{
 
 const editMovieService = async (req,res)=>{
     try {
-        let {title,description,cast,director,maturaity,genres,releaseDate} = req.body
+        let {title,description,cast,director,maturaity,genres,releaseDate,category} = req.body
         let {id} = req.params
         let image = req?.file
         if(image){
             let imageUrl = await uploadFile(image)
-            let data = await moviesModel.findByIdAndUpdate(id,{title,description,cast,director,maturaity,genres,releaseDate,image:imageUrl},{new:true})
+            let data = await moviesModel.findByIdAndUpdate(id,{title,description,cast,director,maturaity,genres,releaseDate,image:imageUrl,category},{new:true})
             if(data){
                 return res.status(HttpStatusCodes["OK"]).json({msg:null,data:data,statusCode:200})
             }
         }
         else{
-            let data = await moviesModel.findByIdAndUpdate(id,{title,description,cast,director,maturaity,genres,releaseDate},{new:true})
+            let data = await moviesModel.findByIdAndUpdate(id,{title,description,cast,director,maturaity,genres,releaseDate,category},{new:true})
             if(data){
                 return res.status(HttpStatusCodes["OK"]).json({msg:null,data:data,statusCode:200})
             }
