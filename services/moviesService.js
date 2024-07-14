@@ -86,6 +86,22 @@ const getSingleMovieService = async (req,res)=>{
     }
 }
 
+const getByCategory = async (req,res)=>{
+    try {
+        let data = await moviesModel.find({category:req.params.category})
+        if(data){
+            return res.status(200).json({msg:null,data:data,statusCode:200})
+        }
+        else{
+            return res.status(HttpStatusCodes["Not Found"]).json({data:null,msg:"No Movie Found",statusCode:HttpStatusCodes["Not Found"]})
+        }
+    } 
+    catch (error) {
+      console.log(error)  
+      return
+    }
+}
+
 
 const deleteMovieService = async (req,res)=>{
     try {
@@ -105,4 +121,4 @@ const deleteMovieService = async (req,res)=>{
 }
 
 
-module.exports = {createMovieService,editMovieService,getAllMovieService,getSingleMovieService,deleteMovieService}
+module.exports = {createMovieService,editMovieService,getAllMovieService,getSingleMovieService,deleteMovieService,getByCategory}
