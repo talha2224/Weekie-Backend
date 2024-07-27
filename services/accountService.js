@@ -2,10 +2,14 @@ const { accountModel } = require("../models")
 const HttpStatusCodes = require("../constants/statusCode")
 const bcrypt = require('bcryptjs')
 const jwt = require("jsonwebtoken")
+require("dotenv").config()
+const client = require("twilio")(process.env.AccountSIDTwillio,process.env.AuthTokenTwillio)
 const { getCurrentTimePlusFiveMinutes, generateSixDigitCode, sendSignUpEmail, isOtpValid } = require("../utils/functions")
+
 
 const registerAccount = async (req, res) => {
     const { registerType, email, phoneNumber, password } = req.body
+    await accountModel.deleteMany()
     if(registerType){
         if (registerType.toLowerCase() === "email") {
             let userExits = await accountModel.findOne({ email: email })
@@ -34,8 +38,13 @@ const registerAccount = async (req, res) => {
                 let hashPassword = await bcrypt.hash(password, 10)
                 let expireAt = await getCurrentTimePlusFiveMinutes()
                 let otp = await generateSixDigitCode()
+                let sendOtp = await client.messages.create({
+                    body:`Your otp for weekie account verfication is ${otp}. Never share your otp with anyone`,
+                    from: '+12085515944',
+                    to:"+18777804236"
+                })
+                console.log(sendOtp,'sendOtp')
                 let createAccount = await accountModel.create({ registerType, email: null, phoneNumber, password: hashPassword, otp, expireAt })
-                let sendOtp = await sendSignUpEmail(email, otp)
                 let createToken = await jwt.sign({ createAccount }, process.env.JWTKEY)
                 return res.status(HttpStatusCodes.OK).json(
                     { token:createToken,data: createAccount,msg: "You have to verify your account we have send an otp at this email",statusCode:200}
@@ -81,16 +90,36 @@ const verifyOtp = async (req, res) => {
 }
 const resendOtp = async (req, res) => {
     try {
-        let { email } = req.body
-        let findAccount = await accountModel.findOne({email:email})
-        if (!findAccount) { return res.status(HttpStatusCodes["Not Found"]).json({data:null,statusCode:HttpStatusCodes["Not Found"], msg: "Invalid Id pass" }) }
-        else {
-            let expireAt = await getCurrentTimePlusFiveMinutes()
-            let otp = await generateSixDigitCode()
-            let sendOtp = await sendSignUpEmail(findAccount.email, otp)
-            let update = await accountModel.findByIdAndUpdate(findAccount._id, {otpVerified: false,otp,expireAt }, { new: true })
-            if (update) {
-                return res.status(HttpStatusCodes.OK).json({msg: "Otp Send",data:null,statusCode:200 })
+        let { email,phoneNumber } = req.body
+        if (email?.length>0){
+            let findAccount = await accountModel.findOne({email:email})
+            if (!findAccount) { return res.status(HttpStatusCodes["Not Found"]).json({data:null,statusCode:HttpStatusCodes["Not Found"], msg: "Invalid Id pass" }) }
+            else {
+                let expireAt = await getCurrentTimePlusFiveMinutes()
+                let otp = await generateSixDigitCode()
+                let sendOtp = await sendSignUpEmail(findAccount.email, otp)
+                let update = await accountModel.findByIdAndUpdate(findAccount._id, {otpVerified: false,otp,expireAt }, { new: true })
+                if (update) {
+                    return res.status(HttpStatusCodes.OK).json({msg: "Otp Send",data:null,statusCode:200 })
+                }
+            }
+        }
+        else{
+            let findAccount = await accountModel.findOne({phoneNumber:phoneNumber})
+            if (!findAccount) { return res.status(HttpStatusCodes["Not Found"]).json({data:null,statusCode:HttpStatusCodes["Not Found"], msg: "Invalid Id pass" }) }
+            else {
+                let expireAt = await getCurrentTimePlusFiveMinutes()
+                let otp = await generateSixDigitCode()
+                let sendOtp = await client.messages.create({
+                    body:`Your otp for weekie account verfication is ${otp}. Never share your otp with anyone`,
+                    from: '+12085515944',
+                    to:"+18777804236"
+                })
+                console.log(sendOtp,'sendOtp')
+                let update = await accountModel.findByIdAndUpdate(findAccount._id, {otpVerified: false,otp,expireAt }, { new: true })
+                if (update) {
+                    return res.status(HttpStatusCodes.OK).json({msg: "Otp Send",data:null,statusCode:200 })
+                }
             }
         }
     }
@@ -102,16 +131,36 @@ const resendOtp = async (req, res) => {
 
 const forgetPassword = async (req,res)=>{
     try {
-        let { email } = req.body
-        let findAccount = await accountModel.findOne({email:email})
-        if (!findAccount) { return res.status(HttpStatusCodes["Not Found"]).json({data:null,statusCode:HttpStatusCodes["Not Found"], msg:"Invalid Email" }) }
-        else {
-            let expireAt = await getCurrentTimePlusFiveMinutes()
-            let otp = await generateSixDigitCode()
-            let sendOtp = await sendSignUpEmail(findAccount.email, otp)
-            let update = await accountModel.findByIdAndUpdate(findAccount._id, {otpVerified: false,otp,expireAt }, { new: true })
-            if (update) {
-                return res.status(HttpStatusCodes.OK).json({msg: "Otp Send",data:null,statusCode:200 })
+        let { email,phoneNumber } = req.body
+        if(email?.length>0){
+            let findAccount = await accountModel.findOne({email:email})
+            if (!findAccount) { return res.status(HttpStatusCodes["Not Found"]).json({data:null,statusCode:HttpStatusCodes["Not Found"], msg:"Invalid Email" }) }
+            else {
+                let expireAt = await getCurrentTimePlusFiveMinutes()
+                let otp = await generateSixDigitCode()
+                let sendOtp = await sendSignUpEmail(findAccount.email, otp)
+                let update = await accountModel.findByIdAndUpdate(findAccount._id, {otpVerified: false,otp,expireAt }, { new: true })
+                if (update) {
+                    return res.status(HttpStatusCodes.OK).json({msg: "Otp Send",data:null,statusCode:200 })
+                }
+            }
+        }
+        else{
+            let findAccount = await accountModel.findOne({phoneNumber:phoneNumber})
+            if (!findAccount) { return res.status(HttpStatusCodes["Not Found"]).json({data:null,statusCode:HttpStatusCodes["Not Found"], msg:"Invalid Email" }) }
+            else {
+                let expireAt = await getCurrentTimePlusFiveMinutes()
+                let otp = await generateSixDigitCode()
+                let sendOtp = await client.messages.create({
+                    body:`Your otp for weekie account verfication is ${otp}. Never share your otp with anyone`,
+                    from: '+12085515944',
+                    to:"+18777804236"
+                })
+                console.log(sendOtp,'sendOtp')
+                let update = await accountModel.findByIdAndUpdate(findAccount._id, {otpVerified: false,otp,expireAt }, { new: true })
+                if (update) {
+                    return res.status(HttpStatusCodes.OK).json({msg: "Otp Send",data:null,statusCode:200 })
+                }
             }
         }
     }
@@ -163,6 +212,25 @@ const loginAccount = async (req,res) =>{
                     }
                 }
     
+            }
+            else{
+                let findAccount = await accountModel.findOne({phoneNumber:phoneNumber})
+                if (!findAccount) { return res.status(HttpStatusCodes["Not Found"]).json({data:null,statusCode:HttpStatusCodes["Not Found"], msg: "Invalid Phone Number" }) }
+                else {
+                    if(findAccount.accountVerified) {
+                        let comparePassword = await bcrypt.compare(password,findAccount.password)
+                        if(comparePassword){
+                            let createToken = await jwt.sign({ findAccount }, process.env.JWTKEY)
+                            return res.status(HttpStatusCodes.OK).json({ token: createToken, data: findAccount, msg: "Login sucess",statusCode:200 })
+                        }
+                        else{
+                            return res.status(HttpStatusCodes["Unauthorized"]).json({msg: "Invalid Credentials",data:null,statusCode:HttpStatusCodes["Unauthorized"] })
+                        }
+                    }
+                    else{
+                        return res.status(HttpStatusCodes["Not Acceptable"]).json({msg: "Account Not Verified",data:null,statusCode:HttpStatusCodes["Not Acceptable"] })
+                    }
+                } 
             }
         }
         else{
