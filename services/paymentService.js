@@ -7,22 +7,12 @@ const stripe = require('stripe')(process.env.StripeSecretKey)
 
 
 const proceedPayment = async (req,res)=>{
-    let {success_url,cancel_url,priceId,userId } = req.body
+    let {sessionid,priceId,userId } = req.body
     try {
-        const session = await stripe.checkout.sessions.create({
-            success_url:success_url,
-            cancel_url:cancel_url,
-            line_items:[
-                {price:priceId,quantity:1}
-            ],
-            mode:"subscription"
-        })
-
-        console.log(session,session.id,session.url)
-        let sessionId = session.id
+        
         let subscriptionType = process.env.StripeMonthly == priceId ? "Monthly" : "Annually"
-        let storeSession = await accountModel.findByIdAndUpdate(userId,{sessionid:sessionId,subscriptionType})
-        res.status(200).json({url:session.url})
+        let storeSession = await accountModel.findByIdAndUpdate(userId,{sessionid:sessionid,subscriptionType})
+        res.status(200).json({data:storeSession,statusCode:200,msg:"Session Id Store In Database"})
     } 
     catch (error) {
         console.log(error)
