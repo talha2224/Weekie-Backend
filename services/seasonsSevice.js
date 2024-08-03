@@ -1,4 +1,4 @@
-const { SeasonIntro, Season, likesModel } = require("../models");
+const { SeasonIntro, Season, likesModel, dislikeModel } = require("../models");
 const { uploadFile } = require("../utils/functions");
 const HttpStatusCodes = require("../constants/statusCode")
 
@@ -99,9 +99,9 @@ const getSingleEpisodeService = async (req,res)=>{
     try {
         let data = await Season.findById(req.params.id).populate("seasonId")
         let likes = await likesModel.find({movieId:req.params.id})
-
-        if (data) {
-            return res.status(200).json({msg:null,statusCode:200, data: data,likes:likes})
+        let disLike = await dislikeModel.find({movieId:req.params.id})
+        if(data){
+            return res.status(200).json({msg:null,data:data,likes:likes,disLikes:disLike,statusCode:200})
         }
         else {
             return res.status(HttpStatusCodes["Not Found"]).json({data:null,statusCode:404, msg: "No Season Found" })

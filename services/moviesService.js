@@ -1,4 +1,4 @@
-const { moviesModel,likesModel } = require("../models");
+const { moviesModel,likesModel,dislikeModel } = require("../models");
 const { uploadFile } = require("../utils/functions");
 const HttpStatusCodes = require("../constants/statusCode")
 
@@ -73,8 +73,9 @@ const getSingleMovieService = async (req,res)=>{
     try {
         let data = await moviesModel.findById(req.params.id)
         let likes = await likesModel.find({movieId:req.params.id})
+        let disLike = await dislikeModel.find({movieId:req.params.id})
         if(data){
-            return res.status(200).json({msg:null,data:data,likes:likes,statusCode:200})
+            return res.status(200).json({msg:null,data:data,likes:likes,disLikes:disLike,statusCode:200})
         }
         else{
             return res.status(HttpStatusCodes["Not Found"]).json({data:null,msg:"No Movie Found",statusCode:HttpStatusCodes["Not Found"]})
